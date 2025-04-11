@@ -38,6 +38,7 @@ This repository contains a tool for generating documentation for AI projects. Th
 - Generate Comments: Checkbox to add AI-generated comments.
 - Run: Button to start the documentation generation process.
 - Log Output: Text area to display the processing logs.
+  
   ![image](https://github.com/user-attachments/assets/38d715d5-8ac0-4e75-966c-db19b3a82ad5)
 
 
