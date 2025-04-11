@@ -1,0 +1,147 @@
+import json
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, AutoModelForCausalLM, pipeline
+import openai
+
+
+MODEL_NAME = "bigcode/starcoderbase-1b"
+
+def load_model():
+    """
+    Loads the CodeT5 model from Hugging Face and returns a generation pipeline.
+    """
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, trust_remote_code=True)
+    model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, trust_remote_code=True)
+    return pipeline("text-generation", model=model, tokenizer=tokenizer)
+
+def load_parsed_data(parsed_path="parsed_data.json"):
+    """
+    Loads the parsed repository data from a JSON file.
+    """
+    with open(parsed_path, 'r', encoding='utf-8') as f:
+        return json.load(f)
+import os
+import json
+import openai
+
+def generate_readme_with_chatgpt(files_data):
+    # Load your OpenAI API key from environment
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+
+    if not openai.api_key:
+        print("❌ OPENAI_API_KEY is not set in environment variables.")
+        return ""
+
+    # Prepare the prompt
+    prompt = (
+        "You are an AI assistant. Write a complete README.md for the repository shared\n"
+        "Include sections: Project Title, Description, Installation, Usage, and License. Go into details for installation and usage, including the necessary library and the places where a user need to input their own variables.\n\n"
+        "Project files:\n"
+    )
+
+    for file_data in files_data:
+        path = file_data['path']
+        snippet = file_data['content'] 
+        prompt += f"- Path: {path}\nContent:\n{snippet}\n\n"
+
+    prompt += "\nNow write the full README.md content:\n"
+
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are an expert software documenter."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=800
+        )
+
+        readme = response['choices'][0]['message']['content']
+        return readme.strip()
+
+    except Exception as e:
+        print(f"❌ Error calling OpenAI API: {e}")
+        return ""
+
+
+    except Exception as e:
+        print(f"❌ Error generating README.md: {e}")
+        return ""
+
+def comment_code_with_chatgpt(files_data):
+    """
+    Adds AI-generated comments directly to original code files,
+    without modifying the existing logic.
+    Only processes .py, .cpp, .js, and .html files.
+    """
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    if not openai.api_key:
+        print("❌ OPENAI_API_KEY is not set.")
+        return
+
+    valid_extensions = ('.py', '.cpp', '.js', '.html')
+
+    for file in files_data:
+        file_path = file["path"]
+        filename = os.path.basename(file_path)
+
+        if not filename.endswith(valid_extensions):
+            continue
+
+        content = file["content"]
+
+        prompt = (
+            f"You are an expert developer. Your task is to add helpful, concise comments to this {filename} file.\n"
+            "Do not modify or reformat the existing code. Just add inline comments or comment blocks above functions, classes, or sections as needed.\n"
+            "Return only the updated code with added comments.\n\n"
+            f"{content}"
+        )
+
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a senior developer helping document source code."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.2,
+                max_tokens=1500
+            )
+
+            commented_code = response['choices'][0]['message']['content'].strip()
+
+            # Overwrite the original file
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(commented_code)
+
+            print(f"✅ Updated with comments: {filename}")
+
+        except Exception as e:
+            print(f"❌ Failed to comment {filename}: {e}")
+
+
+
+
+
+def save_readme(readme_content, output_file="README.md"):
+    """
+    Saves the generated README content to a file.
+    """
+    if readme_content:
+        with open(output_file, "w", encoding='utf-8') as f:
+            f.write(readme_content)
+        print(f"✅ README.md generated successfully and saved to {output_file}.")
+    else:
+        print("❌ Failed to generate README.md.")
+
+def run_inference(parsed_path="parsed_data.json"):
+    """
+    Runs the inference to generate README.md from parsed files.
+    """
+    files = load_parsed_data(parsed_path)
+    
+    readme_content = generate_readme_with_chatgpt(files)
+    save_readme(readme_content)
+
+if __name__ == "__main__":
+    run_inference()
