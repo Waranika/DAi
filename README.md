@@ -1,5 +1,6 @@
-# Project Title
-AI Project Documentation Generator
+# DAi
+Document your ticket with AI !
+This project is open source and will have the MIT license, feel free to fork it and improve
 
 ## Description
 This repository contains a tool for generating documentation for AI projects. The tool parses the repository files, runs inference to generate README files, and adds AI-generated comments to code files. It provides options to use a local model or the OpenAI API for generating documentation.
@@ -37,6 +38,8 @@ This repository contains a tool for generating documentation for AI projects. Th
 - Generate Comments: Checkbox to add AI-generated comments.
 - Run: Button to start the documentation generation process.
 - Log Output: Text area to display the processing logs.
+  ![image](https://github.com/user-attachments/assets/38d715d5-8ac0-4e75-966c-db19b3a82ad5)
+
 
 ### Additional Information
 - The `inference.py` file contains functions for generating README files and adding comments using either the OpenAI API or a local model.
