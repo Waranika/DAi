@@ -26,6 +26,11 @@ This repository contains a tool for generating documentation for AI projects. Th
 4. If using a local model, enable the checkbox and provide the path to the local model folder.
 5. Click on the "Run" button to start the documentation generation process.
 
+*OR*
+
+1. Run `main.py` in the  `src` directory.
+2. Follow the prompts of the terminal
+
 ### Variables
 - `repo_path`: Path to the repository directory.
 - `use_local_model`: Boolean indicating whether to use a local model or the OpenAI API.
