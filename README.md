@@ -12,7 +12,12 @@ This repository contains a tool for generating documentation for AI projects. Th
    ```
    pip install PyQt5 openai transformers
    ```
-4. Ensure you have an OpenAI API key set in your environment variables if using the OpenAI model.
+4. Ensure you have an OpenAI API key set in your environment variables if using the OpenAI model. You can do so with: 
+```
+ setx OPENAI_API_KEY = "Your API Key here"
+ ```
+
+5. If you wish to use your own model have it ready in a folder straight from hugginface
 
 ## Usage
 1. Run the `DAi_GUI.py` file located in the `src` directory.
